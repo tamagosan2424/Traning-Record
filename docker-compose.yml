@@ -1,0 +1,38 @@
+services:
+  web:
+    container_name: "web"
+    build:
+      dockerfile: "./docker/nginx/Dockerfile"
+    ports:
+      - "8900:80"
+    volumes:
+      - "./src:/var/www/html"
+  app:
+    container_name: "app"
+    mem_limit: 6g
+    build:
+      dockerfile: "./docker/php/Dockerfile"
+    volumes:
+      - "./src:/var/www/html"
+    ports:
+      - 5173:5173
+    environment:
+      - DB_CONNECTION=${DB_CONNECTION:-mysql}
+      - DB_HOST=${DB_HOST:-db}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_DATABASE=${DB_DATABASE:-laravel-docker}
+      - DB_USERNAME=${DB_USERNAME:-user}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+  db:
+    container_name: db
+    build:
+      dockerfile: "./docker/db/Dockerfile"
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_DATABASE=${DB_NAME:-laravel-docker}
+      - MYSQL_USER=${DB_USER:-user}
+      - MYSQL_PASSWORD=${DB_PASS:-password}
+      - MYSQL_ROOT_PASSWORD=${DB_PASS:-password}
+    volumes:
+      - "./docker/db/data:/var/lib/mysql"
